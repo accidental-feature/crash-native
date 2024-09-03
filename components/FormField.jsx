@@ -24,6 +24,7 @@ const FormField = ({ label, placeholder, value, handleChangeText, otherStyles = 
             placeholder={placeholder}
             placeholderTextColor='#7b7b8b'
             secureTextEntry={label === 'Password' && !showPassword}
+            {...props}
          />
          {label === 'Password' && (
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
