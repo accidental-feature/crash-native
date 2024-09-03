@@ -1,10 +1,12 @@
-import { View, Text, ScrollView, Image } from "react-native";
+import { View, Text, ScrollView, Image, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from '../../constants';
 import FormField from "../../components/FormField";
 import CustomButton from '../../components/CustomButton';
 import { useState } from "react";
 import { Link } from "expo-router";
+import { router } from "expo-router";
+import { createUser } from "../../lib/appwrite";
 
 const SignUp = () => {
    const [form, setForm] = useState({
@@ -15,13 +17,27 @@ const SignUp = () => {
    const [isSubmitting, setIsSubmitting] = useState(false);
    
    
-   const onSubmit = () => {
-      console.log(form);
+   const onSubmit = async () => {
+      if(!form.userName || !form.email || !form.password) {
+         Alert.alert('Cannot Create Account', 'Please fill in all fields');
+         return
+      };
+      setIsSubmitting(true);
+
+      try {
+         const result = await createUser(form.email, form.password, form.userName);
+         // TODO: set to global state
+
+         router.replace('/home');
+      } catch(error) {
+         Alert.alert('Error', error.message);
+         setIsSubmitting(false);
+      }
    }
    return (
       <SafeAreaView className={"bg-primary h-full"}>
-         <ScrollView>
-         <View className="h-[85vh] justify-center px-4 my-4">
+         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+         <View className="min-h-[85vh] justify-center px-4 my-4">
             <Image source={images.logo} resizeMode="contain" className="w-[115px] h-[35px]" />
             <Text className='text-2xl text-white mt-10 font-psemibold'>Sign Up to Crash</Text>
 
@@ -50,7 +66,7 @@ const SignUp = () => {
             />
 
             <CustomButton 
-               title="Sign in"
+               title="Sign Up"
                handlePress={onSubmit}
                containerStyles='mt-7'
                isLoading={isSubmitting}
